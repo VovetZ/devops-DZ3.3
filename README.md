@@ -118,7 +118,13 @@ Part of the utsname information is also accessible via
 ### Ответ
 ```bash
 ```
-
+Оператор `;` дает возможность задать в одной строке несколько команд, которые будут выполнены последовательно, одна за другой.
+Оператор `&&` являются управляющим оператором. Если в командной строке стоит command1 && command2, то command2 выполняется в том, и только в том случае, если статус выхода из команды command1 равен нулю, что говорит об успешном ее завершении. В общем - логическое "И" для выполнения команд
+>-e      Exit  immediately  if a pipeline (which may consist of a
+ single simple command),  a subshell command enclosed in parentheses,
+ or one of the commands executed as part of a command list enclosed by
+ braces (see SHELL GRAMMAR above) exits with a non-zero  status.
+Таким образом, после `set -e` использование `&&` не имеет смысла
 
 >8. Из каких опций состоит режим bash `set -euxo pipefail` и почему его хорошо было бы использовать в сценариях?
 ### Ответ
