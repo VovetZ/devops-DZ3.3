@@ -54,9 +54,7 @@ ora         25575   8194 oracle    oracle   33   REG   65,65  4294983680  310149
 
 >4. Занимают ли зомби-процессы какие-то ресурсы в ОС (CPU, RAM, IO)?
 ### Ответ
-```bash
-```
-
+Нет, не занимают. Только `pid` не освобождают.
 
 >5. В iovisor BCC есть утилита `opensnoop`:
     ```bash
@@ -66,16 +64,49 @@ ora         25575   8194 oracle    oracle   33   REG   65,65  4294983680  310149
     На какие файлы вы увидели вызовы группы `open` за первую секунду работы утилиты? Воспользуйтесь пакетом `bpfcc-tools` для Ubuntu 20.04. Дополнительные [сведения по установке](https://github.com/iovisor/bcc/blob/master/INSTALL.md).
 ### Ответ
 ```bash
+vagrant@vagrant:~$ sudo /usr/sbin/opensnoop-bpfcc
+PID    COMM               FD ERR PATH
+814    vminfo              5   0 /var/run/utmp
+627    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
+627    dbus-daemon        19   0 /usr/share/dbus-1/system-services
+627    dbus-daemon        -1   2 /lib/dbus-1/system-services
+627    dbus-daemon        19   0 /var/lib/snapd/dbus-1/system-services/
+814    vminfo              5   0 /var/run/utmp
+627    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
+627    dbus-daemon        19   0 /usr/share/dbus-1/system-services
+627    dbus-daemon        -1   2 /lib/dbus-1/system-services
+627    dbus-daemon        19   0 /var/lib/snapd/dbus-1/system-services/
 ```
 
 
 >6. Какой системный вызов использует `uname -a`? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в `/proc`, где можно узнать версию ядра и релиз ОС.
 ### Ответ
 ```bash
+vagrant@vagrant:~$ strace uname -a
+execve("/usr/bin/uname", ["uname", "-a"], 0x7ffd89d77368 /* 23 vars */) = 0
+.................
+uname({sysname="Linux", nodename="vagrant", ...}) = 0
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0x1), ...}) = 0
+uname({sysname="Linux", nodename="vagrant", ...}) = 0
+uname({sysname="Linux", nodename="vagrant", ...}) = 0
+write(1, "Linux vagrant 5.4.0-91-generic #"..., 106Linux vagrant 5.4.0-91-generic #102-Ubuntu SMP Fri Nov 5 16:31:28 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+) = 106
+.................
+exit_group(0)                           = ?
++++ exited with 0 +++
+
+
 ```
-
-
-
+```
+UNAME(2)                Linux Programmer's Manual               UNAME(2)
+NAME         top
+       uname - get name and information about current kernel
+................
+Part of the utsname information is also accessible via
+       /proc/sys/kernel/{ostype, hostname, osrelease, version,
+       domainname}.
+...............
+```
 >7. Чем отличается последовательность команд через `;` и через `&&` в bash? Например:
     ```bash
     root@netology1:~# test -d /tmp/some_dir; echo Hi
